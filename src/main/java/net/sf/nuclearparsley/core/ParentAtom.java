@@ -43,12 +43,21 @@ public class ParentAtom extends Atom implements List<Atom> {
 	 * @param input	Datasource
 	 * @param start	Starting pointer of this {@link Atom} in the Datasource
 	 * @param length	Length of this {@link Atom} in bytes
-	 * @throws IOException	Reading the file failed
+	 * @throws AtomException	Reading the {@link Atom} failed
 	 */
-	protected ParentAtom(String name, RandomAccessFile input, long start, long length) throws IOException {
+	protected ParentAtom(
+			String name, RandomAccessFile input, long start, long length)
+				throws AtomException {
 		super(name, input, start, length);
 		
-		children = parse();
+		try {
+			children = parse();
+		} catch (IOException e) {
+			throw new AtomException(
+					"The stream containing the Atom could not be read while trying to read the children.",
+					e
+				);
+		}
 	}
 	
 	/**
@@ -69,7 +78,11 @@ public class ParentAtom extends Atom implements List<Atom> {
 				len = input.readLong();
 			}
 			result.add(new Atom(new String(name), input, pointer, len));
-			assert pointer + len > pointer;
+			if (len <= 0 || pointer + len <= pointer)
+				throw new AtomException(
+						"Pointer is overflowing after Atom \""
+						+name+"\" at address "+pointer+" and length "+len+"."
+					);
 			pointer += len;
 		}
 		}
