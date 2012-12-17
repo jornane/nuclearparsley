@@ -1,0 +1,3 @@
+# Nuclear Parsley
+This program will provide a way to read and write atoms found in modern media files. The functionality is partly equal to that of Atomic Parsley. The difference between Nuclear Parsley and Atomic Parsley is that Nuclear Parsley will be more powerful; in Atomic Parsley, iTunes is the first class citizen. This means that in Atomic Parsley most operations are operations which can also be done using iTunes. Nuclear Parsley will give a more low-level approach towards editing the atoms. Logically, this means that both iTunes-supported and non-iTunes supported atoms can be read and written.
+The program is currently being built from scratch, meaning that the functionality at this point is pretty much nil.
