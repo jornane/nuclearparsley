@@ -26,7 +26,7 @@ import net.sf.nuclearparsley.core.ParentAtom;
 /**
  * Program which will show all non-nested Atoms in a file
  */
-public class AtomList {
+public final class AtomList {
 
 	private AtomList() {/*no instantiating*/}
 
