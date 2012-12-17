@@ -44,6 +44,8 @@ public class Atom {
 	public final long start;
 	/** Length of the original (unmodified) Atom */
 	public final long length;
+	/** Location of the payload data relative to the start */
+	protected long offset = -1;
 	/** Name of the original (unmodified) Atom */
 	public final String name;
 
@@ -60,6 +62,14 @@ public class Atom {
 		this.input = input;
 		this.start = start;
 		this.length = length;
+	}
+	
+	/**
+	 * Get the location of the payload data relative to the start
+	 * @return 
+	 */
+	public long getOffset() {
+		return offset;
 	}
 	
 }

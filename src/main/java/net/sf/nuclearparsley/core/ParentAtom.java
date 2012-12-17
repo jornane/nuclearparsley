@@ -74,8 +74,10 @@ public class ParentAtom extends Atom implements List<Atom> {
 			long len = input.readInt() & 0x00000000FFFFFFFFL;
 			byte[] name = new byte[4];
 			input.read(name);
+			offset = 8;
 			if (len == 1) {
 				len = input.readLong();
+				offset = 16;
 			}
 			result.add(new Atom(new String(name), input, pointer, len));
 			if (len <= 0 || pointer + len <= pointer)
