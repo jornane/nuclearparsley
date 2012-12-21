@@ -64,15 +64,19 @@ public final class AtomList {
 			prefix.append("\t");
 		if (atom instanceof ParentAtom) {
 			ParentAtom pa = (ParentAtom) atom;
-			for(Atom a : pa) {
+			for(Atom childAtom : pa) {
 				out.append(prefix);
-				out.append("Atom "+a.name+" @ "+a.start+" of size: "+a.length+", ends @ "+(a.start+a.length));
+				out.append("Atom "+childAtom.name+
+						" @ "+childAtom.start+
+						" of size: "+childAtom.length+
+						", ends @ "+(childAtom.start+childAtom.length)
+					);
 				boolean bin = true;
-				if (a.length < 255 && !(a instanceof ParentAtom)) {
+				if (childAtom.length < 255 && !(childAtom instanceof ParentAtom)) {
 					bin = false;
 					byte[] payload = new byte[0];
 					try {
-						payload = a.getPayload();
+						payload = childAtom.getPayload();
 					} catch (IOException e) {}
 					for(int i=0;i<payload.length && !bin;i++)
 						bin = payload[i] < 32 || payload[i] >= 127;
@@ -80,10 +84,10 @@ public final class AtomList {
 						out.append(prefix);
 						out.append("\tValue \""+new String(payload)+"\"");
 					}
-					out.append(HexFormat.format(payload, prefix));
+					out.append(HexFormat.format(payload, prefix, childAtom.start, 0));
 				} else
 				out.append("\n");
-				printAtom(a, out, (byte) (depth+1));
+				printAtom(childAtom, out, (byte) (depth+1));
 			}
 		}
 	}
