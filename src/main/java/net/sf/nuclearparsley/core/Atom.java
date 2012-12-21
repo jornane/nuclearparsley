@@ -147,8 +147,8 @@ public class Atom {
 	 * @throws IOException Reading the file fails
 	 */
 	public byte[] getPayload() throws IOException {
-		int l = (int) (0x7FFFFFFFL & length);
-		if (l != length)
+		int l = (int) (0x7FFFFFFFL & length-offset);
+		if (l != length-offset)
 			throw new UnsupportedOperationException(
 					"Atom "+name+" is bigger than 2^31 bytes. " +
 					"Java does not support byte arrays that big."
