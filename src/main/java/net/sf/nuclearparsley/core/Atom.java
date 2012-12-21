@@ -22,6 +22,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import net.sf.nuclearparsley.util.LimitedInputStream;
 
@@ -32,6 +35,34 @@ import net.sf.nuclearparsley.util.LimitedInputStream;
 public class Atom {
 
 	/**
+	 * List of all known {@link ParentAtom}s
+	 */
+	public static final List<String> PARENTS = Collections.unmodifiableList(
+			Arrays.asList(
+					new String[] {
+							null,
+							"moov",
+							"trak",
+							"mdia",
+							"minf",
+							"dinf",
+							"stbl",
+							"stsd",
+							"avc1",
+							"tref",
+							"edts",
+							"mp4a",
+							"udta",
+							"ilst",
+							"meta",
+							new String(
+									new byte[]{(byte) 0xA9, 0x74, 0x6F, 0x6F}
+								), // ©too
+						}
+				)
+		);
+	
+	/**
 	 * Instantiate an {@link Atom} from a {@link File}
 	 * @param file	The {@link File} to instantiate the {@link Atom} from
 	 * @return	The {@link Atom} (this will always be a {@link ParentAtom}
@@ -41,41 +72,73 @@ public class Atom {
 		RandomAccessFile input = new RandomAccessFile(file, "r");
 		long length = input.length();
 		input.close();
-		return new ParentAtom(null, file, 0, length);
+		return new ParentAtom(null, file, 0, length, 0);
+	}
+	
+	/**
+	 * 
+	 * @param string
+	 * @param file
+	 * @param pointer
+	 * @param len
+	 * @param offset 
+	 * @return
+	 * @throws IOException
+	 */
+	protected static Atom instantiate(String name, File file, long pointer, long len, int offset)
+			throws IOException {
+		try {
+			if (PARENTS.contains(name))
+				return new ParentAtom(name, file, pointer, len, offset);
+		} catch (Exception e) {
+			return new Atom(name, file, pointer, len, offset, e);
+		}
+		return new Atom(name, file, pointer, len, offset);
 	}
 	
 	/** The datasource */
-	protected final File file;
+	public final File file;
 	/** Starting pointer of the original (unmodified) Atom */
 	public final long start;
 	/** Length of the original (unmodified) Atom */
 	public final long length;
 	/** Location of the payload data relative to the start */
-	protected int offset = -1;
+	public final int offset;
 	/** Name of the original (unmodified) Atom */
 	public final String name;
+	/** The reason the more specific {@link Atom} could not be used */
+	public final Exception error;
 
 	/**
 	 * Construct a new generic Atom
 	 * @param name	4-character name of the {@link Atom}
-	 * @param input	Datasource
+	 * @param file	Datasource
 	 * @param start	Starting pointer of this {@link Atom} in the Datasource
 	 * @param length	Length of this {@link Atom} in bytes
+	 * @param offset	The starting point of this atom in the file
 	 */
-	protected Atom(String name, File file, long start, long length) {
+	protected Atom(String name, File file, long start, long length, int offset) {
+		this(name, file, start, length, offset, null);
+	}
+	
+	/**
+	 * 
+	 * @param name	4-character name of the {@link Atom}
+	 * @param file	Datasource
+	 * @param start	Starting pointer of this {@link Atom} in the Datasource
+	 * @param length	Length of this {@link Atom} in bytes
+	 * @param offset	The starting point of this atom in the file
+	 * @param error	The reason the more specific {@link Atom} could not be used
+	 */
+	public Atom(String name, File file, long start, long length, int offset,
+			Exception error) {
 		assert name == null || name.length() == 4;
 		this.name = name;
 		this.file = file;
 		this.start = start;
 		this.length = length;
-	}
-	
-	/**
-	 * Get the location of the payload data relative to the start
-	 * @return 
-	 */
-	public long getOffset() {
-		return offset;
+		this.offset = offset;
+		this.error = error;
 	}
 	
 	/**
@@ -107,7 +170,7 @@ public class Atom {
 	 * @throws IOException	seeking within the file to find the payload failed
 	 */
 	public InputStream getPayloadStream() throws IOException {
-		return new LimitedInputStream(new FileInputStream(file), start, length);
+		return new LimitedInputStream(new FileInputStream(file), start+offset, length-offset);
 	}
 	
 }

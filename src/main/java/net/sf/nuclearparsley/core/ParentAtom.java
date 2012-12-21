@@ -47,9 +47,9 @@ public class ParentAtom extends Atom implements List<Atom> {
 	 * @throws AtomException	Reading the {@link Atom} failed
 	 */
 	protected ParentAtom(
-			String name, File input, long start, long length)
+			String name, File input, long start, long length, int offset)
 				throws AtomException {
-		super(name, input, start, length);
+		super(name, input, start, length, offset);
 		
 		try {
 			children = parse();
@@ -67,25 +67,25 @@ public class ParentAtom extends Atom implements List<Atom> {
 	 * @throws IOException	Reading the file failed
 	 */
 	private List<Atom> parse() throws IOException {
-		long pointer = start;
+		long pointer = start+offset;
 		final ArrayList<Atom> result = new ArrayList<Atom>();
 		final RandomAccessFile input = new RandomAccessFile(file, "r");
 		try {
-			while(pointer < length) {
+			while(pointer < start+length) {
 				input.seek(pointer);
 				long len = input.readInt() & 0x00000000FFFFFFFFL;
 				final byte[] name = new byte[4];
 				input.read(name);
-				offset = 0x8;
+				int offset = 0x8;
 				if (len == 1) {
 					len = input.readLong();
 					offset = 0x10;
 				}
-				result.add(new Atom(new String(name), file, pointer, len));
+				result.add(Atom.instantiate(new String(name), file, pointer, len, offset));
 				if (len <= 0 || pointer + len <= pointer)
 					throw new AtomException(
 							"Pointer is overflowing after Atom \"" +
-							name+"\" at address "+pointer+" and length "+len+". "
+							new String(name)+"\" at address "+pointer+" and length "+len+". "
 						);
 				pointer += len;
 			}

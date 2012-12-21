@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import net.sf.nuclearparsley.core.Atom;
 import net.sf.nuclearparsley.core.ParentAtom;
+import net.sf.nuclearparsley.util.HexFormat;
 
 /**
  * Program which will show all non-nested Atoms in a file
@@ -42,13 +43,48 @@ public final class AtomList {
 			System.exit(1);
 		}
 		try {
-			ParentAtom children = Atom.fromFile(new File(args[0]));
-			for(Atom a : children) {
-				System.out.println(a.name+" "+a.start+" "+a.length);
-			}
+			System.out.println(
+					atomToString(Atom.fromFile(new File(args[0])))
+				);
 		} catch (IOException e) {
 			System.err.println("Unable to read file "+args[0]);
 			System.exit(2);
+		}
+	}
+	
+	public static String atomToString(Atom atom) {
+		StringBuilder sb = new StringBuilder();
+		printAtom(atom, sb, (byte) 0);
+		return sb.toString();
+	}
+
+	private static void printAtom(Atom atom, StringBuilder out, byte depth) {
+		StringBuilder prefix = new StringBuilder();
+		for(int i=0;i<depth;i++)
+			prefix.append("\t");
+		if (atom instanceof ParentAtom) {
+			ParentAtom pa = (ParentAtom) atom;
+			for(Atom a : pa) {
+				out.append(prefix);
+				out.append("Atom "+a.name+" @ "+a.start+" of size: "+a.length+", ends @ "+(a.start+a.length));
+				boolean bin = true;
+				if (a.length < 255 && !(a instanceof ParentAtom)) {
+					bin = false;
+					byte[] payload = new byte[0];
+					try {
+						payload = a.getPayload();
+					} catch (IOException e) {}
+					for(int i=0;i<payload.length && !bin;i++)
+						bin = payload[i] < 32 || payload[i] >= 127;
+					if (!bin) {
+						out.append(prefix);
+						out.append("\tValue \""+new String(payload)+"\"");
+					}
+					out.append(HexFormat.format(payload, prefix));
+				} else
+				out.append("\n");
+				printAtom(a, out, (byte) (depth+1));
+			}
 		}
 	}
 
