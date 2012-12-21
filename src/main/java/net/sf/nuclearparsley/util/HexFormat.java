@@ -28,9 +28,25 @@ public final class HexFormat {
 	 * Dump data as hexadecimal
 	 * @param data	The data to dump
 	 * @param prefix	The prefix to add to each line
+	 * @param first	The first byte number
+	 * @param max	The highest byte number
 	 * @return	The formatted data
 	 */
 	public static StringBuilder format(byte[] data, StringBuilder prefix) {
+		return format(data, prefix, 0, 0);
+	}
+		/**
+		 * Dump data as hexadecimal
+		 * @param data	The data to dump
+		 * @param prefix	The prefix to add to each line
+		 * @param first	The first byte number
+		 * @param max	The highest byte number
+		 * @return	The formatted data
+		 */
+	public static StringBuilder format(byte[] data, StringBuilder prefix, long first, long max) {
+		if (max < first+data.length)
+			max = first+data.length;
+		final int addrLen = String.format("%x", max).length();
 		StringBuilder result = new StringBuilder();
 		for(int i=0;i<=(data.length|0xF)+1;i++) {
 			if ((i & 0x7) == 0)
@@ -50,13 +66,17 @@ public final class HexFormat {
 					break;
 				result.append(prefix);
 				result.append("\t");
+				String addr = String.format("%x", first+i);
+				while(addr.length() < addrLen)
+					addr = "0"+addr;
+				result.append(addr+" ");
 			}
 			if (i >= data.length)
 				result.append("   ");
 			else if (data[i] < 0x10 && data[i] >= 0)
-				result.append(String.format(" 0%X", data[i]));
+				result.append(String.format(" 0%x", data[i]));
 			else
-				result.append(String.format(" %X", data[i]));
+				result.append(String.format(" %x", data[i]));
 		}
 		return result;
 	}
