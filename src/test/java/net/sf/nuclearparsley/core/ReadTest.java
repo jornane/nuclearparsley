@@ -76,15 +76,16 @@ public final class ReadTest {
 		longLengthTestWriter.close();
 	}
 	
-	public void test(File file) throws IOException {
+	public void test(File file, int expectedOffset) throws IOException {
 		ParentAtom atom = Atom.fromFile(file);
 		assertEquals("ftyp", atom.get(0).name);
-		assertEquals("test", new String(atom.getPayload()).substring((int) atom.offset));
+		assertSame(expectedOffset, atom.get(0).offset);
+		assertEquals("test", new String(atom.get(0).getPayload()));
 	}
 	
 	@Test
 	public void basicTest() throws IOException {
-		test(basicTest);
+		test(basicTest, 8);
 	}
 	
 	@Test
@@ -100,7 +101,7 @@ public final class ReadTest {
 	
 	@Test
 	public void longTest() throws IOException {
-		test(longLengthTest);
+		test(longLengthTest, 16);
 	}
 
 }
