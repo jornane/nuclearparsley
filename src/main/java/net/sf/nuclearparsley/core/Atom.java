@@ -18,8 +18,12 @@
 package net.sf.nuclearparsley.core;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
+
+import net.sf.nuclearparsley.util.LimitedInputStream;
 
 /**
  * Atom in a media file.
@@ -35,17 +39,19 @@ public class Atom {
 	 */
 	public static ParentAtom fromFile(File file) throws IOException {
 		RandomAccessFile input = new RandomAccessFile(file, "r");
-		return new ParentAtom(null, input, 0, input.length());
+		long length = input.length();
+		input.close();
+		return new ParentAtom(null, file, 0, length);
 	}
 	
 	/** The datasource */
-	protected final RandomAccessFile input;
+	protected final File file;
 	/** Starting pointer of the original (unmodified) Atom */
 	public final long start;
 	/** Length of the original (unmodified) Atom */
 	public final long length;
 	/** Location of the payload data relative to the start */
-	protected long offset = -1;
+	protected int offset = -1;
 	/** Name of the original (unmodified) Atom */
 	public final String name;
 
@@ -56,10 +62,10 @@ public class Atom {
 	 * @param start	Starting pointer of this {@link Atom} in the Datasource
 	 * @param length	Length of this {@link Atom} in bytes
 	 */
-	protected Atom(String name, RandomAccessFile input, long start, long length) {
+	protected Atom(String name, File file, long start, long length) {
 		assert name == null || name.length() == 4;
 		this.name = name;
-		this.input = input;
+		this.file = file;
 		this.start = start;
 		this.length = length;
 	}
@@ -70,6 +76,38 @@ public class Atom {
 	 */
 	public long getOffset() {
 		return offset;
+	}
+	
+	/**
+	 * Get the payload of this {@link Atom}.
+	 * Better not call this on <code>mdat</code> or any other {@link Atom} bigger than a few megabytes.
+	 * @throws IOException Reading the file fails
+	 */
+	public byte[] getPayload() throws IOException {
+		int l = (int) (0x7FFFFFFFL & length);
+		if (l != length)
+			throw new UnsupportedOperationException(
+					"Atom "+name+" is bigger than 2^31 bytes. " +
+					"Java does not support byte arrays that big."
+				);
+		final InputStream input = getPayloadStream();
+		try {
+			final byte[] result = new byte[l];
+			input.read(result);
+			return result;
+		} finally {
+			if (input != null)
+				input.close();
+		}
+	}
+	
+	/**
+	 * Get a stream which contains the payload
+	 * @return	the stream
+	 * @throws IOException	seeking within the file to find the payload failed
+	 */
+	public InputStream getPayloadStream() throws IOException {
+		return new LimitedInputStream(new FileInputStream(file), start, length);
 	}
 	
 }

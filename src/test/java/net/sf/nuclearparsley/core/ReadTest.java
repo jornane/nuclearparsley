@@ -79,11 +79,7 @@ public final class ReadTest {
 	public void test(File file) throws IOException {
 		ParentAtom atom = Atom.fromFile(file);
 		assertEquals("ftyp", atom.get(0).name);
-		atom.input.seek(atom.start+4);
-		byte[] value = new byte[4];
-		atom.input.seek(atom.start+atom.offset);
-		atom.input.read(value);
-		assertEquals("test", new String(value));
+		assertEquals("test", new String(atom.getPayload()).substring((int) atom.offset));
 	}
 	
 	@Test

@@ -17,6 +17,7 @@
  */
 package net.sf.nuclearparsley.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class ParentAtom extends Atom implements List<Atom> {
 	 * @throws AtomException	Reading the {@link Atom} failed
 	 */
 	protected ParentAtom(
-			String name, RandomAccessFile input, long start, long length)
+			String name, File input, long start, long length)
 				throws AtomException {
 		super(name, input, start, length);
 		
@@ -67,28 +68,31 @@ public class ParentAtom extends Atom implements List<Atom> {
 	 */
 	private List<Atom> parse() throws IOException {
 		long pointer = start;
-		ArrayList<Atom> result = new ArrayList<Atom>();
-		synchronized(input) {
-		while(pointer < length) {
-			input.seek(pointer);
-			long len = input.readInt() & 0x00000000FFFFFFFFL;
-			byte[] name = new byte[4];
-			input.read(name);
-			offset = 8;
-			if (len == 1) {
-				len = input.readLong();
-				offset = 16;
+		final ArrayList<Atom> result = new ArrayList<Atom>();
+		final RandomAccessFile input = new RandomAccessFile(file, "r");
+		try {
+			while(pointer < length) {
+				input.seek(pointer);
+				long len = input.readInt() & 0x00000000FFFFFFFFL;
+				final byte[] name = new byte[4];
+				input.read(name);
+				offset = 0x8;
+				if (len == 1) {
+					len = input.readLong();
+					offset = 0x10;
+				}
+				result.add(new Atom(new String(name), file, pointer, len));
+				if (len <= 0 || pointer + len <= pointer)
+					throw new AtomException(
+							"Pointer is overflowing after Atom \"" +
+							name+"\" at address "+pointer+" and length "+len+". "
+						);
+				pointer += len;
 			}
-			result.add(new Atom(new String(name), input, pointer, len));
-			if (len <= 0 || pointer + len <= pointer)
-				throw new AtomException(
-						"Pointer is overflowing after Atom \""
-						+name+"\" at address "+pointer+" and length "+len+"."
-					);
-			pointer += len;
+			return result;
+		} finally {
+			input.close();
 		}
-		}
-		return result;
 	}
 
 	/** {@inheritDoc} */
