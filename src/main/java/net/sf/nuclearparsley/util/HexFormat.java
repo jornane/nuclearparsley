@@ -39,7 +39,7 @@ public final class HexFormat {
 				if (i != 0) {
 					result.append(" |");
 					for(int j=i-16;j<i&&j<data.length;j++)
-						result.append(data[j] < 32 || data[j] > 127
+						result.append(data[j] < 32 || data[j] >= 127
 								? '.'
 								: (char)data[j]
 							);
