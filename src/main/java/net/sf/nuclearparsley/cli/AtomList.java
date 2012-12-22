@@ -75,9 +75,13 @@ public class AtomList {
 				System.exit(3);
 			}
 		}
+		if (file == null) {
+			System.err.println(USAGE);
+			System.exit(1);
+		}
 		Atom atom = null;
 		try {
-			atom = Atom.fromFile(new File(args[0]));
+			atom = Atom.fromFile(file);
 		} catch (IOException e) {
 			System.err.println("Unable to read file "+args[0]);
 			System.exit(2);
