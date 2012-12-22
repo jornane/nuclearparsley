@@ -30,7 +30,7 @@ import net.sf.nuclearparsley.util.LimitedInputStream;
 
 /**
  * Atom in a media file.
- * This is the generic Atom type which does not imply anything about it's contents
+ * This is the generic Atom type which does not imply anything about its contents
  */
 public class Atom {
 
