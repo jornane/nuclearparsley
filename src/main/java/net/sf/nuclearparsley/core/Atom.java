@@ -56,6 +56,7 @@ public class Atom {
 							"udta",
 							"ilst",
 							"meta",
+							"dref",
 							new String(
 									new byte[]{(byte) 0xA9, 0x74, 0x6F, 0x6F}
 								), // ©too
