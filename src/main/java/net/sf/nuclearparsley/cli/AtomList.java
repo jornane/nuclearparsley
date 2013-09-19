@@ -176,7 +176,7 @@ public class AtomList {
 				out.append("\tValue \""+new String(payload)+"\"");
 			}
 			if (printHex)
-				out.append(HexFormat.format(payload, prefix, atom.start, 0));
+				out.append(HexFormat.format(payload, prefix, atom.start));
 			else
 				out.append("\n");
 		} else
