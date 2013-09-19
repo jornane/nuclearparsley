@@ -38,14 +38,20 @@ public final class ReadTest {
 
 	private File longLengthTest;
 	
-	/** Atom payload with 0x0C length (correct) */
+	/** Atom payload with 0x0C length (correct) 
+	 * 0x66,0x74,0x79,0x70 = "ftyp"
+	 * 0x74,0x65,0x73,0x74 = "test"
+	 */
 	public static final byte[] BASICTEST = new byte[]{
 			0x00,0x00,0x00,0x0C,
 			0x66,0x74,0x79,0x70,
 			0x74,0x65,0x73,0x74
 		};
 	/** Atom with a long (first word = 1) 
-	 * length below zero (errorneous) */
+	 * length below zero (errorneous)
+	 * 0x66,0x74,0x79,0x70 = "ftyp"
+	 * 0x74,0x65,0x73,0x74 = "test"
+	 */
 	public static final byte[] NEGATIVETEST = new byte[]{
 		0x00, 0x00, 0x00, 0x01,
 		0x66, 0x74, 0x79, 0x70, 
@@ -56,7 +62,10 @@ public final class ReadTest {
 	/** Atom with long (first word = 1) length of 0x14 (unusual, but correct)
 	 * Normally you only use the long notation
 	 * if the length doesn't fit in the first word,
-	 * but that would make for a very big testcase. */
+	 * but that would make for a very big testcase.
+	 * 0x66,0x74,0x79,0x70 = "ftyp"
+	 * 0x74,0x65,0x73,0x74 = "test"
+	 */
 	public static final byte[] LONGLENGTHTEST = new byte[]{
 		0x00, 0x00, 0x00, 0x01,
 		0x66, 0x74, 0x79, 0x70,
