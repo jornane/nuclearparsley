@@ -62,7 +62,7 @@ public class AtomList {
 				case 'V':cli.printStringValue = true;break;
 				case 'x':cli.printHex = false;break;
 				case 'X':cli.printHex = true;break;
-				case 's':cli.maxHumanSize = Integer.parseInt(args[i+1]);break;
+				case 's':cli.maxHumanSize = Integer.parseInt(args[i++]);break;
 				case '-':forceFile = true;
 				}
 			} else if (file == null) {
