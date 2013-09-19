@@ -83,6 +83,7 @@ public class AtomList {
 		try {
 			atom = Atom.fromFile(file);
 		} catch (IOException e) {
+			e.printStackTrace();
 			System.err.println("Unable to read file "+args[0]);
 			System.exit(2);
 		}

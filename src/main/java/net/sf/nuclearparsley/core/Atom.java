@@ -17,6 +17,7 @@
  */
 package net.sf.nuclearparsley.core;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -89,12 +90,12 @@ public class Atom {
 	protected static Atom instantiate(String name, File file, long pointer, long len, int offset)
 			throws IOException {
 		try {
-			if (PARENTS.contains(name))
-				return new ParentAtom(name, file, pointer, len, offset);
-		} catch (Exception e) {
+			return new ParentAtom(name, file, pointer, len, offset);
+		} catch (EOFException e) {
+			return new Atom(name, file, pointer, len, offset, e);
+		} catch (AtomException e) {
 			return new Atom(name, file, pointer, len, offset, e);
 		}
-		return new Atom(name, file, pointer, len, offset);
 	}
 	
 	/** The datasource */

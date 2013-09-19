@@ -20,11 +20,14 @@ package net.sf.nuclearparsley.core;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+
+import net.sf.nuclearparsley.util.HexFormat;
 
 /**
  * Atom in a media file. The Parent Atom contains other Atoms.
@@ -45,20 +48,14 @@ public class ParentAtom extends Atom implements List<Atom> {
 	 * @param start	Starting pointer of this {@link Atom} in the Datasource
 	 * @param length	Length of this {@link Atom} in bytes (including offset)
 	 * @throws AtomException	Reading the {@link Atom} failed
+	 * @throws IOException 
 	 */
 	protected ParentAtom(
 			String name, File input, long start, long length, int offset)
-				throws AtomException {
+				throws AtomException, IOException {
 		super(name, input, start, length, offset);
 		
-		try {
-			children = parse();
-		} catch (IOException e) {
-			throw new AtomException(
-					"The stream containing the Atom could not be read while trying to read the children.",
-					e
-				);
-		}
+		children = parse();
 	}
 	
 	/**
@@ -91,13 +88,21 @@ public class ParentAtom extends Atom implements List<Atom> {
 				}
 				if (len == 1) {
 					len = input.readLong();
-					offset = 0x10;
+					offset += 0x8;
 				}
-				result.add(Atom.instantiate(new String(name), file, pointer, len, offset));
+				if (pointer+len > start+length)
+					throw new AtomException("Atom "+new String(name, Charset.forName("US-ASCII"))+" is larger than its enclosing atom.");
+				result.add(Atom.instantiate(
+						new String(name, Charset.forName("US-ASCII")),
+						file,
+						pointer,
+						len,
+						offset
+					));
 				if (len <= 0 || pointer + len <= pointer)
 					throw new AtomException(
 							"Pointer is overflowing after Atom \"" +
-							new String(name)+"\" at address "+pointer+" and length "+len+". "
+							new String(name, Charset.forName("US-ASCII"))+"\" at 0x"+Long.toHexString(pointer)+" and length "+len+". "
 						);
 				pointer += len;
 			}
