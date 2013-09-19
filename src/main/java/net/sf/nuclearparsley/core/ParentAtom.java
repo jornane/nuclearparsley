@@ -222,4 +222,24 @@ public class ParentAtom extends Atom implements List<Atom> {
 		return children.subList(fromIndex, toIndex);
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return children.hashCode();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		try {
+			return ((ParentAtom) obj).children.equals(children);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 }
