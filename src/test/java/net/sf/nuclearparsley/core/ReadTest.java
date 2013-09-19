@@ -38,11 +38,14 @@ public final class ReadTest {
 
 	private File longLengthTest;
 	
+	/** Atom payload with 0x0C length (correct) */
 	public static final byte[] BASICTEST = new byte[]{
 			0x00,0x00,0x00,0x0C,
 			0x66,0x74,0x79,0x70,
 			0x74,0x65,0x73,0x74
 		};
+	/** Atom with a long (first word = 1) 
+	 * length below zero (errorneous) */
 	public static final byte[] NEGATIVETEST = new byte[]{
 		0x00, 0x00, 0x00, 0x01,
 		0x66, 0x74, 0x79, 0x70, 
@@ -50,6 +53,10 @@ public final class ReadTest {
 		-0x1, -0x1, -0x1,-0x14, 
 		0x74, 0x65, 0x73, 0x74
 	};
+	/** Atom with long (first word = 1) length of 0x14 (unusual, but correct)
+	 * Normally you only use the long notation
+	 * if the length doesn't fit in the first word,
+	 * but that would make for a very big testcase. */
 	public static final byte[] LONGLENGTHTEST = new byte[]{
 		0x00, 0x00, 0x00, 0x01,
 		0x66, 0x74, 0x79, 0x70,
@@ -76,21 +83,40 @@ public final class ReadTest {
 		longLengthTestWriter.close();
 	}
 	
-	public void test(File file, int expectedOffset) throws IOException {
+	/**
+	 * Parse file and check if the expectedOffset 
+	 * after parsing is the same as expected
+	 * 
+	 * @param file the file to parse
+	 * @param expectedOffset expected 
+	 * @throws IOException reading the stream failed (test fails)
+	 * @throws AtomException the atom is invalid (test fails)
+	 */
+	protected void test(File file, int expectedOffset) throws IOException, AtomException {
 		ParentAtom atom = Atom.fromFile(file);
 		assertEquals("ftyp", atom.get(0).name);
 		assertSame(expectedOffset, atom.get(0).offset);
 		assertEquals("test", new String(atom.get(0).getPayload()));
 	}
 	
+	/**
+	 * Conform that {@link #BASICTEST} works
+	 * @throws IOException reading the stream failed (test fails)
+	 * @throws AtomException the atom is invalid (test fails)
+	 */
 	@Test
-	public void basicTest() throws IOException {
+	public void basicTest() throws IOException, AtomException {
 		test(basicTest, 8);
 	}
 	
+	/**
+	 * Confirms that {@link #NEGATIVETEST} doesn't work
+	 * @throws IOException reading the stream failed (test fails)
+	 */
 	@Test
 	public void negativeTest() throws IOException {
 		try {
+			/* Not calling #test(File,int) because we have no expectedOffset */
 			Atom.fromFile(negativeTest);
 			fail("An exception should have been thrown.");
 		} catch (AtomException ae) {
@@ -99,8 +125,13 @@ public final class ReadTest {
 		}
 	}
 	
+	/**
+	 * Confirms that {@link #LONGLENGTHTEST} works
+	 * @throws IOException reading the stream failed (test fails)
+	 * @throws AtomException the atom is invalid (test fails)
+	 */
 	@Test
-	public void longTest() throws IOException {
+	public void longTest() throws IOException, AtomException {
 		test(longLengthTest, 16);
 	}
 
