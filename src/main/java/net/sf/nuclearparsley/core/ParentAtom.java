@@ -43,7 +43,7 @@ public class ParentAtom extends Atom implements List<Atom> {
 	 * @param name	4-character name of the {@link Atom}
 	 * @param input	Datasource
 	 * @param start	Starting pointer of this {@link Atom} in the Datasource
-	 * @param length	Length of this {@link Atom} in bytes
+	 * @param length	Length of this {@link Atom} in bytes (including offset)
 	 * @throws AtomException	Reading the {@link Atom} failed
 	 */
 	protected ParentAtom(
@@ -73,7 +73,7 @@ public class ParentAtom extends Atom implements List<Atom> {
 		try {
 			while(pointer < start+length) {
 				input.seek(pointer);
-				long len = input.readInt() & 0x00000000FFFFFFFFL;
+				long len = input.readInt() & 0x00000000FFFFFFFFL; // Unsigned positive integer
 				final byte[] name = new byte[4];
 				input.read(name);
 				int offset = 0x8;

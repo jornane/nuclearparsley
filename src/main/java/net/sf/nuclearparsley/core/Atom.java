@@ -30,7 +30,7 @@ import net.sf.nuclearparsley.util.LimitedInputStream;
 
 /**
  * Atom in a media file.
- * This is the generic Atom type which does not imply anything about its contents
+ * This is the generic Atom type which does not imply anything about its contents.
  */
 public class Atom {
 
@@ -76,13 +76,14 @@ public class Atom {
 	}
 	
 	/**
+	 * Read an atom from a file. 
 	 * 
-	 * @param string
-	 * @param file
-	 * @param pointer
-	 * @param len
-	 * @param offset 
-	 * @return
+	 * @param name	4 bytes name of the Atom
+	 * @param file	File containing the Atom
+	 * @param pointer	Starting pointer of the original (unmodified) Atom
+	 * @param len	Length of the original (unmodified) Atom
+	 * @param offset	Location of the payload data relative to the start
+	 * @return	Atom object matching the input data as specific as possible
 	 * @throws IOException
 	 */
 	protected static Atom instantiate(String name, File file, long pointer, long len, int offset)
