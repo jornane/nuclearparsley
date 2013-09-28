@@ -27,8 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.nuclearparsley.util.HexFormat;
-
 /**
  * Atom in a media file. The Parent Atom contains other Atoms.
  * @todo	Instead of simply compositing the internal {@link List},
