@@ -82,9 +82,6 @@ public class ParentAtom extends Atom implements List<Atom> {
 					len = input.readLong();
 					input.read(name);
 					offset += 0x8;
-					byte[] debug = new byte[(int) (length-16)];
-					input.read(debug);
-					System.out.println(HexFormat.format(debug, new StringBuilder()));
 				}
 				if (len == 1) {
 					len = input.readLong();
