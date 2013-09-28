@@ -147,6 +147,7 @@ public class Atom {
 	/**
 	 * Get the payload of this {@link Atom}.
 	 * Better not call this on <code>mdat</code> or any other {@link Atom} bigger than a few megabytes.
+	 * Look at {@link #getPayloadStream()} for reading these bigger {@link Atom}s.
 	 * @throws IOException Reading the file fails
 	 */
 	public byte[] getPayload() throws IOException {
