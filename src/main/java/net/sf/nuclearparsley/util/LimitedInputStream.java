@@ -50,12 +50,12 @@ public class LimitedInputStream extends InputStream {
 		read = 0;
 		max = length;
 	}
-	
+
 	/** {@inheritDoc} */
 	public int available() throws IOException {
  		return in.available();
 	}
-	
+
 	public void close() throws IOException {
 		in.close();
 	}
@@ -65,11 +65,11 @@ public class LimitedInputStream extends InputStream {
 		in.mark(readLimit);
 		mark = read;
 	}
-	
+
 	public boolean markSupported() {
 		return in.markSupported();
 	}
-	
+
 	/** {@inheritDoc} */
 	@Override
 	public int read() throws IOException {
@@ -79,12 +79,12 @@ public class LimitedInputStream extends InputStream {
 		read++;
 		return result;
 	}
-	
+
 	/** {@inheritDoc} */
 	public int read(byte b[]) throws IOException {
 		return read(b, 0, b.length);
 	}
-	
+
 	/** {@inheritDoc} */
 	public int read(byte b[], int off, int len) throws IOException {
 		if (read+len >= max) {
@@ -101,7 +101,7 @@ public class LimitedInputStream extends InputStream {
 		in.reset();
 		read = mark;
 	}
-	
+
 	/** {@inheritDoc} */
 	public long skip(long n) throws IOException {
 		final long result = in.skip(n);
