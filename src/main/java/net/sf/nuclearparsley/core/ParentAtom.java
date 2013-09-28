@@ -77,8 +77,8 @@ public class ParentAtom extends Atom implements List<Atom> {
 				if (len == 0 && name[0] == 0 && name[1] == 0 && name[2] == 0 && name[3] == 1) {
 					// FIXME: I don't understand why some atoms have 0x0000000000000001 at their beginning,
 					// and appear to be a normal atom from there
-					// This has nothing to do with long lengths, 
-					// because they are indicated with 0x00000001 at the start.
+					// This has nothing to do with long (> 4 bytes) lengths, 
+					// because they only have the len field 0x01, not len+name.
 					len = input.readLong();
 					input.read(name);
 					offset += 0x8;
