@@ -40,13 +40,22 @@ public class ParentAtom extends Atom implements List<Atom> {
 	protected List<Atom> children;
 
 	/**
+	 * Convert a byte array to an ASCII string, used for atom conversion.
+	 * @param name	byte array
+	 * @return	the string
+	 */
+	protected static String nameToString(byte[] name) {
+		return new String(name, Charset.forName("US-ASCII"));
+	}
+	
+	/**
 	 * Construct a new {@link ParentAtom} and parse the content to find the children {@link Atom}s.
 	 * @param name	4-character name of the {@link Atom}
 	 * @param input	Datasource
 	 * @param start	Starting pointer of this {@link Atom} in the Datasource
 	 * @param length	Length of this {@link Atom} in bytes (including offset)
 	 * @throws AtomException	Reading the {@link Atom} failed
-	 * @throws IOException 
+	 * @throws IOException	Reading the file failed
 	 */
 	protected ParentAtom(
 			String name, File input, long start, long length, int offset)
@@ -73,10 +82,18 @@ public class ParentAtom extends Atom implements List<Atom> {
 				input.read(name);
 				int offset = 0x8;
 				if (len == 0 && name[0] == 0 && name[1] == 0 && name[2] == 0 && name[3] == 1) {
-					// FIXME: I don't understand why some atoms have 0x0000000000000001 at their beginning,
-					// and appear to be a normal atom from there
-					// This has nothing to do with long (> 4 bytes) lengths, 
-					// because they only have the len field 0x01, not len+name.
+					/*
+					 * Some atoms have 0x0000000000000001 at their beginning,
+					 * and appear to be a normal atom from there
+					 * This has nothing to do with long (> 4 bytes) lengths, 
+					 * because they only have the len field 0x00000001, not len+name.
+					 * 
+					 * This block increases the offset of the atom with 8 bytes
+					 * and re-reads the length and name.
+					 * 
+					 * It is the responsibility of the implementation of the atom
+					 * to write itself in this way again on change.
+					 */
 					len = input.readLong();
 					input.read(name);
 					offset += 0x8;
@@ -85,26 +102,52 @@ public class ParentAtom extends Atom implements List<Atom> {
 					len = input.readLong();
 					offset += 0x8;
 				}
-				if (pointer+len > start+length)
-					throw new AtomException("Atom "+new String(name, Charset.forName("US-ASCII"))+" is larger than its enclosing atom.");
-				result.add(Atom.instantiate(
-						new String(name, Charset.forName("US-ASCII")),
-						file,
-						pointer,
-						len,
-						offset
-					));
-				if (len <= 0 || pointer + len <= pointer)
-					throw new AtomException(
-							"Pointer is overflowing after Atom \"" +
-							new String(name, Charset.forName("US-ASCII"))+"\" at 0x"+Long.toHexString(pointer)+" and length "+len+". "
-						);
+				sanityCheck(pointer, len, nameToString(name));
+				pushAtom(pointer, len, offset, nameToString(name), result);
 				pointer += len;
 			}
 			return result;
 		} finally {
 			input.close();
 		}
+	}
+
+	/**
+	 * Add the atom to the result
+	 * @param pointer	the start pointer of the atom
+	 * @param len	the length of the atom
+	 * @param offset	the start pointer of the payload relative to "pointer"
+	 * @param name	the name of the atom (this is used to make a more readable error message, it is not checked)
+	 * @param result	the result	
+	 * @throws IOException
+	 */
+	private void pushAtom(long pointer, long len, int offset, String name, ArrayList<Atom> result) throws IOException {
+		result.add(Atom.instantiate(
+				name,
+				file,
+				pointer,
+				len,
+				offset
+			));
+	}
+
+	/**
+	 * Check whether the variables we end up after parsing make sense.
+	 * Specifically we check if this atom fits in it's parent atom and if the variables aren't overflowing.
+	 * 
+	 * @param pointer	the start pointer of the atom
+	 * @param len	the length of the atom
+	 * @param name	the name of the atom (this is used to make a more readable error message, it is not checked)
+	 * @throws AtomException	when the entered variables do not make sense
+	 */
+	protected void sanityCheck(long pointer, long len, String name) throws AtomException {
+		if (pointer+len > start+length)
+			throw new AtomException("Atom "+name+" is larger than its enclosing atom.");
+		if (len <= 0 || pointer + len <= pointer)
+			throw new AtomException(
+					"Pointer is overflowing after Atom \"" +
+					name+"\" at 0x"+Long.toHexString(pointer)+" and length "+len+". "
+				);
 	}
 
 	/** {@inheritDoc} */
