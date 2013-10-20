@@ -33,7 +33,7 @@ import net.sf.nuclearparsley.util.LimitedInputStream;
  * Atom in a media file.
  * This is the generic Atom type which does not imply anything about its contents.
  */
-public class Atom {
+public class Atom implements Cloneable {
 
 	/**
 	 * List of all known {@link ParentAtom}s
@@ -221,6 +221,14 @@ public class Atom {
 		if (start != other.start)
 			return false;
 		return true;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Atom clone() throws CloneNotSupportedException {
+		return (Atom) super.clone();
 	}
 	
 }
