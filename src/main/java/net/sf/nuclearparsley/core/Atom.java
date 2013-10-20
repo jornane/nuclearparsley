@@ -77,7 +77,7 @@ public class Atom implements Cloneable {
 	public final int offset;
 	/** Name of the original (unmodified) Atom */
 	public final String name;
-	/** The reason the more specific {@link Atom} could not be used */
+	/** The reason why a more specific {@link Atom} could not be used */
 	public final Exception error;
 
 	/**
@@ -113,6 +113,24 @@ public class Atom implements Cloneable {
 	}
 	
 	/**
+	 * Get the header of this {@link Atom}.
+	 * The header consists of all bytes from the beginning of the atom up to the start of the payload.
+	 * Thus, the size of the header is the same as {@link #offset}.
+	 * @throws IOException Reading the file fails
+	 */
+	public byte[] getHeader() throws IOException {
+		final InputStream input = getStream();
+		try {
+			final byte[] result = new byte[offset];
+			input.read(result);
+			return result;
+		} finally {
+			if (input != null)
+				input.close();
+		}
+	}
+	
+	/**
 	 * Get the payload of this {@link Atom}.
 	 * Better not call this on <code>mdat</code> or any other {@link Atom} bigger than a few megabytes.
 	 * Look at {@link #getPayloadStream()} for reading these bigger {@link Atom}s.
@@ -123,7 +141,8 @@ public class Atom implements Cloneable {
 		if (l != length-offset)
 			throw new UnsupportedOperationException(
 					"Atom "+name+" is bigger than 2^31 bytes. " +
-					"Java does not support byte arrays that big."
+					"Java does not support byte arrays that big. " +
+					"Try #getPayloadStream()"
 				);
 		final InputStream input = getPayloadStream();
 		try {
@@ -136,6 +155,15 @@ public class Atom implements Cloneable {
 		}
 	}
 	
+	/**
+	 * Get a stream which contains the header and the payload
+	 * @return	the stream
+	 * @throws IOException	seeking within the file to find the payload failed
+	 */
+	public InputStream getStream() throws IOException {
+		return new LimitedInputStream(new FileInputStream(file), start, length);
+	}
+
 	/**
 	 * Get a stream which contains the payload
 	 * @return	the stream
