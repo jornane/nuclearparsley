@@ -22,10 +22,13 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 /**
  * Atom in a media file. The Parent Atom contains other Atoms.
@@ -36,6 +39,11 @@ import java.util.ListIterator;
  */
 public class ParentAtom extends Atom implements List<Atom> {
 
+	/**
+	 * List of atoms with a non-standard offset.
+	 */
+	public static final Map<String, Integer> EXTRAOFFSETS;
+	
 	/**	{@link List} with all the children originally contained in this {@link Atom} */
 	protected List<Atom> children;
 
@@ -65,6 +73,18 @@ public class ParentAtom extends Atom implements List<Atom> {
 		children = parse();
 	}
 	
+	static {
+		HashMap<String, Integer> extraOffsets = new HashMap<String, Integer>();
+		extraOffsets.put("mean", 4);
+		extraOffsets.put("meta", 4);
+		extraOffsets.put("name", 4);
+		extraOffsets.put("dref", 8);
+		extraOffsets.put("stsd", 8);
+		extraOffsets.put("data", 8);
+		extraOffsets.put("mp4a", 28);
+		EXTRAOFFSETS = Collections.unmodifiableMap(extraOffsets);
+	}
+	
 	/**
 	 * Parse the content of input to find the children {@link Atom}s
 	 * @return	A {@link List} containing all the children of this {@link Atom}
@@ -88,6 +108,7 @@ public class ParentAtom extends Atom implements List<Atom> {
 					len = input.readLong();
 					offset += 0x8;
 				}
+				offset += getOffset(nameToString(name));
 				sanityCheck(pointer, len, nameToString(name));
 				pushAtom(pointer, len, offset, nameToString(name), result);
 				pointer += len;
@@ -96,6 +117,16 @@ public class ParentAtom extends Atom implements List<Atom> {
 		} finally {
 			input.close();
 		}
+	}
+	
+	/**
+	 * Get the offset for a name
+	 * @param name	name to get the offset for
+	 * @return	the offset for name
+	 */
+	private static int getOffset(String name) {
+		Integer result = EXTRAOFFSETS.get(name);
+		return result == null ? 0 : result;
 	}
 
 	/**
