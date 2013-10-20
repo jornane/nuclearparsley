@@ -21,9 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -72,7 +72,7 @@ public class ParentAtom extends Atom implements List<Atom> {
 	 */
 	private List<Atom> parse() throws IOException {
 		long pointer = start+offset;
-		final ArrayList<Atom> result = new ArrayList<Atom>();
+		final LinkedList<Atom> result = new LinkedList<Atom>();
 		final RandomAccessFile input = new RandomAccessFile(file, "r");
 		try {
 			while(pointer < start+length) {
@@ -121,7 +121,7 @@ public class ParentAtom extends Atom implements List<Atom> {
 	 * @param result	the result	
 	 * @throws IOException
 	 */
-	private void pushAtom(long pointer, long len, int offset, String name, ArrayList<Atom> result) throws IOException {
+	private void pushAtom(long pointer, long len, int offset, String name, LinkedList<Atom> result) throws IOException {
 		result.add(Atom.instantiate(
 				name,
 				file,
