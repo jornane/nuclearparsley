@@ -23,9 +23,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import net.sf.nuclearparsley.util.LimitedInputStream;
 
@@ -35,35 +32,6 @@ import net.sf.nuclearparsley.util.LimitedInputStream;
  */
 public class Atom implements Cloneable {
 
-	/**
-	 * List of all known {@link ParentAtom}s
-	 */
-	public static final List<String> PARENTS = Collections.unmodifiableList(
-			Arrays.asList(
-					new String[] {
-							null,
-							"moov",
-							"trak",
-							"mdia",
-							"minf",
-							"dinf",
-							"stbl",
-							"stsd",
-							"avc1",
-							"tref",
-							"edts",
-							"mp4a",
-							"udta",
-							"ilst",
-							"meta",
-							"dref",
-							new String(
-									new byte[]{(byte) 0xA9, 0x74, 0x6F, 0x6F}
-								), // ©too
-						}
-				)
-		);
-	
 	/**
 	 * Instantiate an {@link Atom} from a {@link File}
 	 * @param file	The {@link File} to instantiate the {@link Atom} from

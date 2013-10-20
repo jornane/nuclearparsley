@@ -81,22 +81,8 @@ public class ParentAtom extends Atom implements List<Atom> {
 				final byte[] name = new byte[4];
 				input.read(name);
 				int offset = 0x8;
-				if (len == 0 && name[0] == 0 && name[1] == 0 && name[2] == 0 && name[3] == 1) {
-					/*
-					 * Some atoms have 0x0000000000000001 at their beginning,
-					 * and appear to be a normal atom from there
-					 * This has nothing to do with long (> 4 bytes) lengths, 
-					 * because they only have the len field 0x00000001, not len+name.
-					 * 
-					 * This block increases the offset of the atom with 8 bytes
-					 * and re-reads the length and name.
-					 * 
-					 * It is the responsibility of the implementation of the atom
-					 * to write itself in this way again on change.
-					 */
-					len = input.readLong();
-					input.read(name);
-					offset += 0x8;
+				if (len == 0 || !checkName(name)) {
+					throw new AtomException("Invalid parameters");
 				}
 				if (len == 1) {
 					len = input.readLong();
@@ -110,6 +96,19 @@ public class ParentAtom extends Atom implements List<Atom> {
 		} finally {
 			input.close();
 		}
+	}
+
+	/**
+	 * Check if an atom name is valid.
+	 * A valid name only contains lower ASCII characters, or 0xA9
+	 * @param name	the name to check
+	 * @return	whether the name is valid
+	 */
+	private boolean checkName(byte[] name) {
+		for(int i=0;i<name.length;i++)
+			if ((name[i] < 32 && name[i] != (byte)0xA9) || name[i] > 126)
+				return false;
+		return true;
 	}
 
 	/**
