@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 
 import net.sf.nuclearparsley.util.LimitedInputStream;
 
@@ -35,14 +34,11 @@ public class Atom implements Cloneable {
 	/**
 	 * Instantiate an {@link Atom} from a {@link File}
 	 * @param file	The {@link File} to instantiate the {@link Atom} from
-	 * @return	The {@link Atom} (this will always be a {@link ParentAtom}
+	 * @return	The {@link RootAtom} in file
 	 * @throws IOException	If reading the {@link File} fails for some reason.
 	 */
-	public static ParentAtom fromFile(File file) throws IOException {
-		RandomAccessFile input = new RandomAccessFile(file, "r");
-		long length = input.length();
-		input.close();
-		return new ParentAtom(null, file, 0, length, 0);
+	public static RootAtom fromFile(File file) throws IOException {
+		return new RootAtom(file);
 	}
 	
 	/**
