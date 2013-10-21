@@ -106,9 +106,9 @@ public class ParentAtom extends Atom implements List<Atom> {
 					offset += 0x8;
 				}
 				if (len < 8)
-					throw new AtomException("Invalid atom length ("+len+")");
+					throw new AtomException("Invalid Atom length ("+len+")");
 				if (!checkName(name))
-					throw new AtomException("Invalid atom name");
+					throw new AtomException("Invalid Atom name");
 				offset += getOffset(nameToString(name));
 				sanityCheck(pointer, len, nameToString(name));
 				pushAtom(pointer, len, offset, nameToString(name), result);
