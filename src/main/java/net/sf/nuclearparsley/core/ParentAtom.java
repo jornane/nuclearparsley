@@ -101,13 +101,14 @@ public class ParentAtom extends Atom implements List<Atom> {
 				final byte[] name = new byte[4];
 				input.read(name);
 				int offset = 0x8;
-				if (len == 0 || !checkName(name)) {
-					throw new AtomException("Invalid parameters");
-				}
 				if (len == 1) {
 					len = input.readLong();
 					offset += 0x8;
 				}
+				if (len < 8)
+					throw new AtomException("Invalid atom length ("+len+")");
+				if (!checkName(name))
+					throw new AtomException("Invalid atom name");
 				offset += getOffset(nameToString(name));
 				sanityCheck(pointer, len, nameToString(name));
 				pushAtom(pointer, len, offset, nameToString(name), result);
