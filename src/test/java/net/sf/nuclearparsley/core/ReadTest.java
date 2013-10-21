@@ -129,8 +129,7 @@ public final class ReadTest {
 			Atom.fromFile(negativeTest);
 			fail("An exception should have been thrown.");
 		} catch (AtomException ae) {
-			assertTrue(ae.getMessage(), ae.getMessage().toLowerCase().contains("pointer"));
-			assertTrue(ae.getMessage(), ae.getMessage().toLowerCase().contains("overflow"));
+			assertTrue(ae.getMessage(), ae.getMessage().toLowerCase().contains("atom length"));
 		}
 	}
 	
