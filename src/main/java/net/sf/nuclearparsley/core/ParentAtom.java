@@ -136,7 +136,7 @@ public class ParentAtom extends Atom implements List<Atom> {
 	 * @param name	the name to check
 	 * @return	whether the name is valid
 	 */
-	private boolean checkName(byte[] name) {
+	private static boolean checkName(byte[] name) {
 		for(int i=0;i<name.length;i++)
 			if ((name[i] < 32 && name[i] != (byte)0xA9) || name[i] > 126)
 				return false;
