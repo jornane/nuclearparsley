@@ -42,7 +42,7 @@ public class ParentAtom extends Atom implements List<Atom> {
 	/**
 	 * List of atoms with a non-standard offset.
 	 */
-	public static final Map<String, Integer> EXTRAOFFSETS;
+	private static final Map<String, Integer> EXTRAOFFSETS;
 	
 	/**	{@link List} with all the children originally contained in this {@link Atom} */
 	protected List<Atom> children;
