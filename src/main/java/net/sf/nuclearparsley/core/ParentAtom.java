@@ -82,6 +82,7 @@ public class ParentAtom extends Atom implements List<Atom> {
 		extraOffsets.put("stsd", 8);
 		extraOffsets.put("data", 8);
 		extraOffsets.put("mp4a", 28);
+		extraOffsets.put("avc1", 78);
 		EXTRAOFFSETS = Collections.unmodifiableMap(extraOffsets);
 	}
 	
