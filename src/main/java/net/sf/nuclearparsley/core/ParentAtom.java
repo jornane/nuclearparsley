@@ -33,7 +33,7 @@ import java.util.Map;
 
 /**
  * Atom in a media file. The Parent Atom contains other Atoms.
- * @todo	Instead of simply compositing the internal {@link List},
+ * @todo	Instead of simply composing the internal {@link List},
  *      	the methods implemented from {@link List} should be implemented
  *      	in such a way that changes can be tracked,
  *      	so the modified {@link Atom}s can be saved.
