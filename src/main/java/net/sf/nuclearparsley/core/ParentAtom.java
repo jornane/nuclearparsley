@@ -17,6 +17,7 @@
  */
 package net.sf.nuclearparsley.core;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -107,16 +108,19 @@ public class ParentAtom extends Atom implements List<Atom> {
 					offset += 0x8;
 				}
 				if (len < 8)
-					throw new AtomException("Invalid Atom length ("+len+")");
+					throw new AtomException(file, start, "Invalid Atom length ("+len+")");
 				if (!checkName(name))
-					throw new AtomException("Invalid Atom name");
+					throw new AtomException(file, start, "Invalid Atom name");
 				offset += getOffset(nameToString(name));
 				sanityCheck(pointer, len, nameToString(name));
 				pushAtom(pointer, len, offset, nameToString(name), result);
 				pointer += len;
 			}
 			return result;
-		} finally {
+		} catch (EOFException e) {
+			throw new AtomException(file, start, "Atom start+length exceeds file length", e);
+		}
+		finally {
 			input.close();
 		}
 	}
@@ -174,9 +178,11 @@ public class ParentAtom extends Atom implements List<Atom> {
 	 */
 	protected void sanityCheck(long pointer, long len, String name) throws AtomException {
 		if (pointer+len > start+length)
-			throw new AtomException("Atom "+name+" is larger than its enclosing atom.");
+			throw new AtomException(file, start, "Atom "+name+" is larger than its enclosing atom.");
 		if (len <= 0 || pointer + len <= pointer)
 			throw new AtomException(
+					file,
+					start,
 					"Pointer is overflowing after Atom \"" +
 					name+"\" at 0x"+Long.toHexString(pointer)+" and length "+len+". "
 				);

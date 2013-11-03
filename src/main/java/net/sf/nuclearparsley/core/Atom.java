@@ -17,7 +17,6 @@
  */
 package net.sf.nuclearparsley.core;
 
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -56,8 +55,6 @@ public class Atom implements Cloneable {
 			throws IOException {
 		try {
 			return new ParentAtom(name, file, pointer, len, offset);
-		} catch (EOFException e) {
-			return new Atom(name, file, pointer, len, offset, e);
 		} catch (AtomException e) {
 			return new Atom(name, file, pointer, len, offset, e);
 		}
@@ -97,7 +94,7 @@ public class Atom implements Cloneable {
 	 * @param offset	The starting point of this atom in the file
 	 * @param error	The reason the more specific {@link Atom} could not be used
 	 */
-	public Atom(String name, File file, long start, long length, int offset,
+	protected Atom(String name, File file, long start, long length, int offset,
 			Exception error) {
 		assert name == null || name.length() == 4;
 		this.name = name;

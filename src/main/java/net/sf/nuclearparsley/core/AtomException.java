@@ -17,36 +17,63 @@
  */
 package net.sf.nuclearparsley.core;
 
+import java.io.File;
+
 /**
  * Indicating that something went wrong while parsing or writing an {@link Atom}.
  */
 public class AtomException extends RuntimeException {
 	/** Basic {@link RuntimeException} implementation */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
+	/** The file from which this Atom was read */
+	public final File sourceFile;
+	/** The location of the Atom in {@link #sourceFile}. 
+	 *  The location is the byte where the name starts. */
+	public final long start;
+	
 	/**
 	 * Declare an {@link AtomException} with a message
+	 * @param sourceFile	The file from which the atom originated
+	 * @param start	Offset in the file where the atom starts
 	 * @param message	The message indicating what went wrong
 	 */
-	public AtomException(String message) {
+	public AtomException(File sourceFile, long start, String message) {
 		super(message);
+		this.sourceFile = sourceFile;
+		this.start = start;
 	}
 
 	/**
 	 * Declare an {@link AtomException} with a cause
+	 * @param sourceFile	The file from which the atom originated
+	 * @param start	Offset in the file where the atom starts
 	 * @param cause	The exception that caused the {@link AtomException} to be thrown
 	 */
-	public AtomException(Throwable cause) {
+	public AtomException(File sourceFile, long start, Throwable cause) {
 		super(cause);
+		this.sourceFile = sourceFile;
+		this.start = start;
 	}
 
 	/**
 	 * Declare an {@link AtomException} with a message and a cause
+	 * @param sourceFile	The file from which the atom originated
+	 * @param start	Offset in the file where the atom starts
 	 * @param message	The message indicating what went wrong
 	 * @param cause	The exception that caused the {@link AtomException} to be thrown
 	 */
-	public AtomException(String message, Throwable cause) {
+	public AtomException(File sourceFile, long start, String message, Throwable cause) {
 		super(message, cause);
+		this.sourceFile = sourceFile;
+		this.start = start;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Exception#getMessage()
+	 */
+	public String getMessage() {
+		return "["+sourceFile.getName()+"@"+Long.toString(start, 16)+"] "+super.getMessage();
 	}
 
 }
