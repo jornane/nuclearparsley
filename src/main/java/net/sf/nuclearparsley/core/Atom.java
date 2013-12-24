@@ -105,6 +105,45 @@ public class Atom implements Cloneable {
 		this.error = error;
 	}
 	
+	protected static int readUnsignedWord(InputStream stream) throws IOException {
+		byte[] word = new byte[2];
+		stream.read(word);
+		return 0xFFFF & ((int)word[0]) << 8 | word[1];
+	}
+
+	protected static int readSignedWord(InputStream stream) throws IOException {
+		byte[] word = new byte[2];
+		stream.read(word);
+		return ((int)word[0]) << 8 | word[1];
+	}
+
+	protected static long readUnsignedInteger(InputStream stream) throws IOException {
+		byte[] integer = new byte[4];
+		stream.read(integer);
+		return 0xFFFFFFFFL & (integer[0] << 24 | integer[1] << 16 | integer[2] << 8 | integer[3]);
+	}
+
+	protected static int readSignedInteger(InputStream stream) throws IOException {
+		byte[] integer = new byte[4];
+		stream.read(integer);
+		return integer[0] << 24 | integer[1] << 16 | integer[2] << 8 | integer[3];
+	}
+
+	protected static long readUnsignedLong(InputStream stream) 
+			throws IOException, ArithmeticException {
+		long l0ng = readSignedLong(stream);
+		if (l0ng < 0)
+			throw new ArithmeticException("Long value greater than 63 bits; no primitive type can hold this.");
+		return l0ng;
+	}
+
+	protected static long readSignedLong(InputStream stream) throws IOException {
+		byte[] l0ng = new byte[8];
+		stream.read(l0ng);
+		return ((long)l0ng[0]) << 56 | ((long)l0ng[1]) << 48 | ((long)l0ng[2]) << 40 | ((long)l0ng[3]) << 32
+		     | ((long)l0ng[4]) << 24 | ((long)l0ng[5]) << 16 | ((long)l0ng[6]) <<  8 | ((long)l0ng[7]);
+	}
+
 	/**
 	 * Get the header of this {@link Atom}.
 	 * The header consists of all bytes from the beginning of the atom up to the start of the payload.
