@@ -79,7 +79,7 @@ public class Atom implements Cloneable {
 	 * @param file	Datasource
 	 * @param start	Starting pointer of this {@link Atom} in the Datasource
 	 * @param length	Length of this {@link Atom} in bytes
-	 * @param offset	The starting point of this atom in the file
+	 * @param offset	The starting point of the atom payload from the start of the atom
 	 */
 	protected Atom(String name, File file, long start, long length, int offset) {
 		this(name, file, start, length, offset, null);

@@ -60,9 +60,10 @@ public class ParentAtom extends Atom implements List<Atom> {
 	/**
 	 * Construct a new {@link ParentAtom} and parse the content to find the children {@link Atom}s.
 	 * @param name	4-character name of the {@link Atom}
-	 * @param input	Datasource
-	 * @param start	Starting pointer of this {@link Atom} in the Datasource
+	 * @param input	Atoms are read from this file
+	 * @param start	Starting pointer of this {@link Atom} in input file
 	 * @param length	Length of this {@link Atom} in bytes (including offset)
+	 * @param offset	The starting point of the atom payload from the start of the atom
 	 * @throws AtomException	Reading the {@link Atom} failed
 	 * @throws IOException	Reading the file failed
 	 */
