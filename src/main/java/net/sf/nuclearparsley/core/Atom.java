@@ -54,7 +54,19 @@ public class Atom implements Cloneable {
 	protected static Atom instantiate(String name, File file, long pointer, long len, int offset)
 			throws IOException {
 		try {
-			return new ParentAtom(name, file, pointer, len, offset);
+			switch(name) {
+			case(AVC1Atom.NAME):return new AVC1Atom(file, pointer, len, offset);
+			case(DataAtom.NAME):return new DataAtom(file, pointer, len, offset);
+			case(DRefAtom.NAME):return new DRefAtom(file, pointer, len, offset);
+			case(FTabAtom.NAME):return new FTabAtom(file, pointer, len, offset);
+			case(MeanAtom.NAME):return new MeanAtom(file, pointer, len, offset);
+			case(MetaAtom.NAME):return new MetaAtom(file, pointer, len, offset);
+			case(MP4AAtom.NAME):return new MP4AAtom(file, pointer, len, offset);
+			case(NameAtom.NAME):return new NameAtom(file, pointer, len, offset);
+			case(STSDAtom.NAME):return new STSDAtom(file, pointer, len, offset);
+			case(TX3GAtom.NAME):return new TX3GAtom(file, pointer, len, offset);
+			default     :return new ParentAtom(name, file, pointer, len, offset);
+			}
 		} catch (AtomException e) {
 			return new Atom(name, file, pointer, len, offset, e);
 		}
