@@ -1,6 +1,6 @@
 /*
  * Nuclear Parsley - GPL 3.0 licensed
- * Copyright (C) 2012  Yørn de Jong
+ * Copyright (C) 2015  Jørn Åne de Jong
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
